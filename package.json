@@ -1,0 +1,21 @@
+{
+  "name": "cognos",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cfenv": "^1.2.0",
+    "express": "^4.16.4",
+    "jcognos": "^1.9.0",
+    "minimatch": "^3.0.4",
+    "nodemon": "^1.18.10",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4"
+  }
+}

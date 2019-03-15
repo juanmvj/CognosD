@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>JOFJ</title>
+	<script src="./CognosApi.js"></script>
+	<style type="text/css">
+		body,html{
+			height: 100%;
+		}
+		#displayInfo{
+			height: 100%;
+		}
+	</style>
+	<script type="text/javascript">
+		var sessionObj = null;
+		
+
+		function _createSession(client_id, client_secret, payload) {
+			var xhttp = new XMLHttpRequest();
+			xhttp.open("POST", "https://dde-us-south.analytics.ibm.com/daas/v1/session", true);
+			xhttp.setRequestHeader('Authorization', 'Basic ' + btoa(client_id + ':' + client_secret));
+			xhttp.setRequestHeader('Content-Type', 'application/json');
+
+			return new Promise(function(resolve, reject) {
+				xhttp.onreadystatechange = function() {
+					if (this.readyState == 4) {
+						if (this.status == 201) {
+							resolve(JSON.parse(this.responseText));
+						} else {
+							reject(new Error(this.statusText));
+						}
+					}
+				};
+				xhttp.send(JSON.stringify(payload));
+			});
+		}
+
+function newSession(username, password, payload) {
+			var containerDiv = document.getElementById('displayInfo');
+
+			_createSession(username, password, payload).then(function(session) {
+				sessionObj = session;
+
+				window.onbeforeunload = function() {
+					deleteSession(username, password);
+				}
+				containerDiv.innerHTML = '<h2>Session information</h2><pre>' + JSON.stringify(sessionObj, undefined, 4) + '</pre>';
+			}, function(err) {
+				sessionObj = null;
+				containerDiv.innerHTML = '<h2>Failed to create session</h2>Please check your application credentials.';
+			});
+			
+		}
+		function newApi(){
+
+			window.api = new CognosApi({
+			    cognosRootURL: 'https://us-south.dynamic-dashboard-embedded.cloud.ibm.com/daas/',
+			    sessionCode: sessionObj.sessionCode,
+			    language: 'en',
+			    node: document.getElementById('displayInfo')
+					});
+					window.api.initialize().then(function() {
+					    console.log('API created successfully.');
+					}, function(err) {
+					    console.log('Failed to create API. ' + err.message);
+					});
+
+		}
+
+	</script>
+</head>
+<body>
+
+	<h2>ENHANCE COGNOS ANALYTICS</h2>
+
+	<div style="display: flex;flex-direction: column;justify-content: space-between;width: 150px;height: 50px;">
+		<button   onclick="newSession('6bcbad0c-fc1a-44db-8f95-6a89981c9034','c7384e9ff2850e0d9a06cc9702da4bae20de5873', {'expiresIn': 3600,
+    	'webDomain': 'https://cognos-demoqwerty.mybluemix.net/'});" 
+			style="text-align: left;">1.- Start session </button>
+		<button onclick="newApi()" style="text-align: left;">2.- Start API Framework</button>
+		
+	</div>
+	<!--<div id="displayInfo"></div>-->
+	<div class="iframeContainer" id="displayInfo"></div>
+
+		
+</body>
+</html>
